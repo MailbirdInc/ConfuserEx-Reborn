@@ -5,14 +5,18 @@ using System.Threading;
 namespace Confuser.Runtime {
 	internal static class AntiDebugSafe {
 		static void Initialize() {
-			string x = "COR";
-			var env = typeof(Environment);
-			var method = env.GetMethod("GetEnvironmentVariable", new[] { typeof(string) });
-			if (method != null &&
-			    "1".Equals(method.Invoke(null, new object[] { x + "_ENABLE_PROFILING" })))
-				Environment.FailFast(null);
+            // Removed COR_ENABLE_PROFILING check here since it caused issues with Stackify Prefix which sets that variable.
+            // I'm thinking technically this check should have also checked that COR_PROFILER was set to something:
+            // https://docs.microsoft.com/en-us/dotnet/framework/unmanaged-api/profiling/setting-up-a-profiling-environment
 
-			var thread = new Thread(Worker);
+            //string x = "COR";
+            //var env = typeof(Environment);
+            //var method = env.GetMethod("GetEnvironmentVariable", new[] { typeof(string) });
+            //if (method != null &&
+            //    "1".Equals(method.Invoke(null, new object[] { x + "_ENABLE_PROFILING" })))
+            //	Environment.FailFast(null);
+
+            var thread = new Thread(Worker);
 			thread.IsBackground = true;
 			thread.Start(null);
 		}
